@@ -2,6 +2,8 @@
 
 > A machine-learning-powered web application that predicts freight charges and detects suspicious invoices in real time — built for procurement and logistics teams.
 
+🔗 **Live Demo:** [Vercel Link](https://invoice-flagging.vercel.app/)
+
 ---
 
 **Freight Cost Prediction** uses Linear Regression, Decision Tree, and Random Forest Regressors — the best performer by MAE is selected for inference.

@@ -2,7 +2,7 @@
 
 A machine-learning-powered Flask web application that **predicts freight costs** from invoice dollar amounts and **flags suspicious invoices** using anomaly detection. Built for procurement and logistics teams to perform real-time risk analysis on incoming invoices.
 
-🔗 **Live Demo:** [https://your-app.vercel.app](https://invoice-flagging.vercel.app/)
+🔗 **Live Demo:** [Vercel Website](https://invoice-flagging.vercel.app/)
 
 ---
 

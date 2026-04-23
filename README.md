@@ -1,72 +1,69 @@
-# Invoice Flagging & Freight Cost Prediction
+# 🧾 Invoice Flagging & Freight Cost Prediction
 
-A machine-learning-powered Flask web application that **predicts freight costs** from invoice dollar amounts and **flags suspicious invoices** using anomaly detection. Built for procurement and logistics teams to perform real-time risk analysis on incoming invoices.
-
-🔗 **Live Demo:** [Vercel Website](https://invoice-flagging.vercel.app/)
+> A machine-learning-powered web application that predicts freight charges and detects suspicious invoices in real time — built for procurement and logistics teams.
 
 ---
 
-## Features
+**Freight Cost Prediction** uses Linear Regression, Decision Tree, and Random Forest Regressors — the best performer by MAE is selected for inference.
 
-- **Freight Cost Prediction** — Predicts expected freight charges based on invoice dollar value using a trained regression model.
-- **Invoice Anomaly Flagging** — Classifies invoices as normal or suspicious by analysing quantity/dollar mismatches, freight anomalies, and derived ratio features through a trained ML classifier.
-- **Absurd-Value Sanity Checks** — A lightweight rule layer catches genuinely impossible entries (negative values, extreme ratios) before the ML model runs.
-- **Interactive Dashboard** — A single-page frontend for submitting invoices and viewing predictions in real time.
-- **Deployable on Vercel** — Ships with a `vercel.json` for one-click serverless deployment.
+**Invoice Anomaly Flagging** uses a Random Forest Classifier trained on engineered ratio features (`amount_diff`, `amount_ratio`), with hyperparameter tuning via grid search.
+
+A lightweight rule layer catches logically impossible entries (negative values, extreme ratios) before the ML model runs, ensuring defence-in-depth beyond pure statistical prediction.
 
 ---
 
 ## Tech Stack
 
-| Layer       | Technology                          |
-| ----------- | ----------------------------------- |
-| Backend     | Python · Flask                      |
-| ML / Data   | scikit-learn · pandas · NumPy       |
-| Serialisation | joblib (`.pkl` model files)       |
-| Frontend    | HTML · CSS · JavaScript             |
-| Deployment  | Vercel (Python runtime)             |
+| Layer | Technology |
+|---|---|
+| Backend | Python · Flask |
+| ML / Data | scikit-learn · pandas · NumPy |
+| Serialisation | joblib (`.pkl` model files) |
+| Frontend | HTML · CSS · Vanilla JavaScript |
+| Deployment | Vercel (Python serverless runtime) |
 
 ---
 
 ## Project Structure
 
 ```
-├── app.py                        # Flask application & API routes
-├── requirements.txt              # Python dependencies
-├── vercel.json                   # Vercel deployment config
+.
+├── app.py                          # Flask application & API routes
+├── requirements.txt                # Python dependencies
+├── vercel.json                     # Vercel deployment config
 │
-├── models/                       # Serialised model artefacts
-│   ├── predict_freight_model.pkl # Freight cost regression model
-│   ├── predict_flag_invoice.pkl  # Invoice flag classifier
-│   └── scaler.pkl                # Feature scaler for invoice model
+├── models/
+│   ├── predict_freight_model.pkl   # Saved regression model
+│   ├── predict_flag_invoice.pkl    # Saved classification model
+│   └── scaler.pkl                  # Feature scaler for invoice model
 │
-├── Freight_cost_prediction/      # Freight model training pipeline
+├── Freight_cost_prediction/        # Freight model training pipeline
 │   ├── data_preprocessing.py
 │   ├── train.py
 │   └── model_evaluation.py
 │
-├── invoice_flagging/             # Invoice flag training pipeline
+├── invoice_flagging/               # Invoice flagging training pipeline
 │   ├── data_preprocessing.py
 │   ├── train.py
 │   └── modeling_evaluation.py
 │
-├── inference/                    # Standalone inference scripts
+├── inference/                      # Standalone inference scripts
 │   ├── predict_freight.py
 │   └── predict_invoice_flag.py
 │
-├── Notebooks/                    # Exploratory / training notebooks
+├── Notebooks/                      # Exploratory & training notebooks
 │   ├── Predicting Freight Cost.ipynb
 │   └── Invoice_flagging.ipynb
 │
-├── Data/                         # Dataset (SQLite DB)
-│   └── inventory.db
+├── Data/
+│   └── inventory.db                # SQLite dataset
 │
 ├── templates/
-│   └── index.html                # Dashboard UI
+│   └── index.html                  # Dashboard UI
 │
 └── static/
-    ├── style.css                 # Dashboard styles
-    └── script.js                 # Dashboard logic
+    ├── style.css
+    └── script.js
 ```
 
 ---
@@ -75,21 +72,21 @@ A machine-learning-powered Flask web application that **predicts freight costs**
 
 ### Prerequisites
 
-- **Python 3.10+**
+- Python **3.10** or higher
 
 ### Installation
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/Biki989/Invoice_flagging_prediction.git
 cd Invoice_flagging_prediction
 
-# Create & activate a virtual environment (recommended)
+# 2. Create and activate a virtual environment
 python -m venv venv
 venv\Scripts\activate        # Windows
-# source venv/bin/activate   # macOS / Linux
+source venv/bin/activate     # macOS / Linux
 
-# Install dependencies
+# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
@@ -99,8 +96,12 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The app starts on **http://127.0.0.1:5000** by default.  
-Set `FLASK_DEBUG=1` to enable hot-reload during development.
+The app starts at **http://127.0.0.1:5000**.  
+Enable hot-reload during development:
+
+```bash
+FLASK_DEBUG=1 python app.py
+```
 
 ---
 
@@ -110,8 +111,7 @@ Set `FLASK_DEBUG=1` to enable hot-reload during development.
 
 Predict freight cost from an invoice dollar amount.
 
-**Request Body**
-
+**Request**
 ```json
 {
   "Dollars": 18500
@@ -119,7 +119,6 @@ Predict freight cost from an invoice dollar amount.
 ```
 
 **Response**
-
 ```json
 {
   "predictions": [
@@ -132,10 +131,9 @@ Predict freight cost from an invoice dollar amount.
 
 ### `POST /predict/invoice`
 
-Flag an invoice as normal (`0`) or suspicious (`1`).
+Flag an invoice as **normal** (`0`) or **suspicious** (`1`).
 
-**Request Body**
-
+**Request**
 ```json
 {
   "invoice_quantity": 10,
@@ -147,7 +145,6 @@ Flag an invoice as normal (`0`) or suspicious (`1`).
 ```
 
 **Response**
-
 ```json
 {
   "predictions": [
@@ -156,29 +153,29 @@ Flag an invoice as normal (`0`) or suspicious (`1`).
 }
 ```
 
-| Field                | Type  | Description                            |
-| -------------------- | ----- | -------------------------------------- |
-| `invoice_quantity`   | float | Number of units on the invoice         |
-| `invoice_dollars`    | float | Total dollar amount on the invoice     |
-| `Freight`            | float | Freight/shipping charge on the invoice |
-| `total_item_quantity`| float | Sum of item quantities received        |
-| `total_item_dollars` | float | Sum of item dollar values received     |
+**Request fields**
 
-> `amount_diff` and `amount_ratio` are computed server-side — you do **not** need to send them.
+| Field | Type | Description |
+|---|---|---|
+| `invoice_quantity` | float | Number of units on the invoice |
+| `invoice_dollars` | float | Total dollar amount on the invoice |
+| `Freight` | float | Freight/shipping charge on the invoice |
+| `total_item_quantity` | float | Sum of item quantities received |
+| `total_item_dollars` | float | Sum of item dollar values received |
+
+> `amount_diff` and `amount_ratio` are derived server-side — **do not include them in the request**.
 
 ---
 
 ## Deployment
 
-### Vercel
-
-The project includes a pre-configured `vercel.json`:
+The repository ships with a pre-configured `vercel.json` for one-command serverless deployment.
 
 ```bash
-# Install Vercel CLI
+# Install the Vercel CLI (one time)
 npm i -g vercel
 
-# Deploy
+# Deploy to production
 vercel --prod
 ```
 
@@ -186,16 +183,16 @@ vercel --prod
 
 ## Retraining Models
 
-Training pipelines live in `Freight_cost_prediction/` and `invoice_flagging/`. Each contains:
+Each training pipeline follows the same three-step structure:
 
-1. **`data_preprocessing.py`** — Loads and cleans raw data from `Data/inventory.db`.
-2. **`train.py`** — Trains the model and saves the `.pkl` artefact to `models/`.
-3. **`model_evaluation.py`** — Evaluates model performance metrics.
+1. **`data_preprocessing.py`** — Loads and cleans raw data from `Data/inventory.db`
+2. **`train.py`** — Trains the model and serialises the `.pkl` artefact to `models/`
+3. **`model_evaluation.py`** — Prints performance metrics (MAE, accuracy, etc.)
 
-Jupyter notebooks in `Notebooks/` provide interactive walkthroughs of the full training process.
+For an interactive walkthrough of the full pipeline, open the corresponding notebook in `Notebooks/`.
 
 ---
 
 ## License
 
-This project is provided for educational and demonstration purposes.
+This project is provided for **educational and demonstration purposes** only.
